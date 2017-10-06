@@ -63,6 +63,15 @@ class UsersController extends Controller
         ]);
     }
 
+    public function getAll()
+    {
+        $users = $this->model->where("formacao", "!=", "null")->get();
+
+        return response()->json([
+            'data' => ["professores" => $users],
+        ]);
+    }
+
     /**
      * Store a newly created resource in storage.
      *

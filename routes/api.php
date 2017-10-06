@@ -15,4 +15,6 @@ use Illuminate\Http\Request;
 
 Route::resource('pais', 'PaisesController');
 Route::resource('user', 'UsersController');
+Route::resource('evento', 'EventosController');
 Route::post('login', 'AuthController@login');
+Route::get('professores', 'UsersController@getAll');
