@@ -35,10 +35,15 @@ class Nivel extends Model implements Transformable
 		'name'
 	];
 
-	public function nivel_eventos()
-	{
-		return $this->hasMany(\App\Models\NivelEvento::class, 'nivel_id');
-	}
+    public function eventos()
+    {
+        return $this->hasMany(\App\Models\Evento::class);
+    }
+
+//	public function nivel_eventos()
+//	{
+//		return $this->hasMany(\App\Models\NivelEvento::class, 'nivel_id');
+//	}
 
 	public function user_idiomas()
 	{

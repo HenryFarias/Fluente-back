@@ -74,6 +74,11 @@ class Evento extends Model implements Transformable
 		return $this->belongsTo(\App\Models\Cidade::class);
 	}
 
+    public function nivel()
+    {
+        return $this->belongsTo(\App\Models\Nivel::class);
+    }
+
 	public function user()
 	{
 		return $this->belongsTo(\App\Models\User::class);
@@ -84,10 +89,10 @@ class Evento extends Model implements Transformable
 		return $this->hasMany(\App\Models\Comentario::class);
 	}
 
-	public function nivel_eventos()
-	{
-		return $this->hasMany(\App\Models\NivelEvento::class);
-	}
+//	public function nivel_eventos()
+//	{
+//		return $this->hasMany(\App\Models\NivelEvento::class);
+//	}
 
 	public function users()
 	{

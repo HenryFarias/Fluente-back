@@ -25,7 +25,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  *
  * @package App\Models
  */
-class Seguidore extends Model implements Transformable
+class Seguidores extends Model implements Transformable
 {
     use TransformableTrait;
 	use \Illuminate\Database\Eloquent\SoftDeletes;
@@ -35,6 +35,8 @@ class Seguidore extends Model implements Transformable
 		'user_id' => 'int',
 		'userSeguido_id' => 'int'
 	];
+
+    protected $table = "seguidores";
 
 	protected $fillable = [
 		'aprovacao',

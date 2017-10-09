@@ -63,15 +63,6 @@ class UsersController extends Controller
         ]);
     }
 
-    public function getAll()
-    {
-        $users = $this->model->where("formacao", "!=", "null")->get();
-
-        return response()->json([
-            'data' => ["professores" => $users],
-        ]);
-    }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -127,6 +118,7 @@ class UsersController extends Controller
             "idiomas" => $this->idioma->all(),
             "niveis" => $this->nivel->all(),
             "notificacoes" => $this->notificacao->all(),
+            "professores" => $this->repository->getAllProfessores(),
         ];
 
         return response()->json([

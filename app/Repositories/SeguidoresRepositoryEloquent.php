@@ -2,17 +2,16 @@
 
 namespace App\Repositories;
 
+use App\Interfaces\SeguidoresRepository;
+use App\Models\Seguidores;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
-use App\Repositories\SeguidoreRepository;
-use App\Models\Seguidore;
-use App\Validators\SeguidoreValidator;
 
 /**
  * Class SeguidoreRepositoryEloquent
  * @package namespace App\Repositories;
  */
-class SeguidoreRepositoryEloquent extends BaseRepository implements SeguidoreRepository
+class SeguidoresRepositoryEloquent extends BaseRepository implements SeguidoresRepository
 {
     /**
      * Specify Model class name
@@ -21,7 +20,7 @@ class SeguidoreRepositoryEloquent extends BaseRepository implements SeguidoreRep
      */
     public function model()
     {
-        return Seguidore::class;
+        return Seguidores::class;
     }
 
     

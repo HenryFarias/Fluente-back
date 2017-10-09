@@ -4,8 +4,6 @@ namespace App\Repositories;
 
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
-use App\Repositories\UserRepository;
-use App\Validators\UserValidator;
 use App\Models\User;
 
 /**
@@ -30,5 +28,10 @@ class UserRepositoryEloquent extends BaseRepository implements UserRepository
     public function boot()
     {
         $this->pushCriteria(app(RequestCriteria::class));
+    }
+
+    public function getAllProfessores()
+    {
+        return $this->getModel()->where("formacao", "!=", "null")->get();
     }
 }

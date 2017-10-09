@@ -112,7 +112,7 @@ class User extends Authenticatable implements Transformable
 
 	public function seguidores()
 	{
-		return $this->hasMany(\App\Models\Seguidore::class, 'userSeguido_id');
+		return $this->hasMany(\App\Models\Seguidores::class, 'userSeguido_id');
 	}
 
 	public function idiomas()
