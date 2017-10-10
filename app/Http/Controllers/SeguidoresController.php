@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SeguidoresCreateRequest;
+use App\Http\Requests\SeguidoresUpdateRequest;
+use App\Repositories\SeguidoresRepository;
 use Prettus\Validator\Exceptions\ValidatorException;
-use App\Http\Requests\SeguidoreCreateRequest;
-use App\Http\Requests\SeguidoreUpdateRequest;
-use App\Repositories\SeguidoreRepository;
-use App\Validators\SeguidoreValidator;
+use App\Repositories\UserRepository;
 
 
 class SeguidoresController extends Controller
 {
 
     /**
-     * @var SeguidoreRepository
+     * @var SeguidoresRepository
      */
     protected $repository;
 
@@ -22,7 +22,7 @@ class SeguidoresController extends Controller
      */
     protected $model;
 
-    public function __construct(SeguidoreRepository $repository)
+    public function __construct(SeguidoresRepository $repository)
     {
         $this->repository = $repository;
         $this->model = $repository->getModel();
@@ -51,7 +51,7 @@ class SeguidoresController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function store(SeguidoreCreateRequest $request)
+    public function store(SeguidoresCreateRequest $request)
     {
         try {
             $seguidore = $this->repository->create($request->all());
@@ -78,12 +78,13 @@ class SeguidoresController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, UserRepository $user)
     {
-        $seguidore = $this->repository->find($id);
+        $user->find($id);
 
         return response()->json([
-            'data' => $seguidore,
+//            'data' => $user->getModel()->seguidores()->get(),
+            'data' => ["seguidores" => $this->repository->getSeguidoresByUser($id)],
         ]);
     }
 
@@ -111,7 +112,7 @@ class SeguidoresController extends Controller
      *
      * @return Response
      */
-    public function update(SeguidoreUpdateRequest $request, $id)
+    public function update(SeguidoresUpdateRequest $request, $id)
     {
         try {
             $seguidore = $this->repository->update($request->all(), $id);

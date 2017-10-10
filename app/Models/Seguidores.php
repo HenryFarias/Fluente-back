@@ -44,8 +44,8 @@ class Seguidores extends Model implements Transformable
 		'userSeguido_id'
 	];
 
-	public function user()
-	{
-		return $this->belongsTo(\App\Models\User::class, 'userSeguido_id');
-	}
+//	public function user()
+//	{
+//		return $this->belongsTo(\App\Models\User::class, 'userSeguido_id');
+//	}
 }

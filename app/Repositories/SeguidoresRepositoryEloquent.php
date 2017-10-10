@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Interfaces\SeguidoresRepository;
+use App\Repositories\SeguidoresRepository;
 use App\Models\Seguidores;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
@@ -23,13 +23,16 @@ class SeguidoresRepositoryEloquent extends BaseRepository implements SeguidoresR
         return Seguidores::class;
     }
 
-    
-
     /**
      * Boot up the repository, pushing criteria
      */
     public function boot()
     {
         $this->pushCriteria(app(RequestCriteria::class));
+    }
+
+    public function getSeguidoresByUser($idUser)
+    {
+        return $this->getModel()->where("userSeguido_id", "=", $idUser)->get();
     }
 }
