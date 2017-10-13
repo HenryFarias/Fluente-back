@@ -42,7 +42,6 @@ class Evento extends Model implements Transformable
 	use \Illuminate\Database\Eloquent\SoftDeletes;
 
 	protected $casts = [
-		'duracao' => 'float',
 		'cidade_id' => 'int',
 		'user_id' => 'int',
 		'assunto_id' => 'int'
@@ -54,12 +53,11 @@ class Evento extends Model implements Transformable
 
 	protected $fillable = [
 		'name',
-		'local',
 		'publico_ou_privado',
 		'data',
 		'duracao',
 		'descricao',
-		'cidade_id',
+		'endereco_id',
 		'user_id',
 		'assunto_id'
 	];
@@ -69,14 +67,19 @@ class Evento extends Model implements Transformable
 		return $this->belongsTo(\App\Models\Assunto::class);
 	}
 
-	public function cidade()
+	public function endereco()
 	{
-		return $this->belongsTo(\App\Models\Cidade::class);
+		return $this->belongsTo(\App\Models\Endereco::class);
 	}
 
     public function nivel()
     {
         return $this->belongsTo(\App\Models\Nivel::class);
+    }
+
+    public function idioma()
+    {
+        return $this->belongsTo(\App\Models\Idioma::class);
     }
 
 	public function user()

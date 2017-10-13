@@ -32,9 +32,4 @@ class Notificacao extends Model implements Transformable
 	protected $fillable = [
 		'name'
 	];
-
-	public function users()
-	{
-		return $this->hasMany(\App\Models\User::class, 'notificacao_id');
-	}
 }

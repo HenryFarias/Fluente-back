@@ -87,16 +87,15 @@ class UsersController extends Controller
 
             $this->model->fill($request->all());
 
-            $this->model->perfil()->associate($enderecoRepository->getModel());
+            $this->model->endereco()->associate($enderecoRepository->getModel());
             $this->model->perfil()->associate($perfil);
-            $this->model->notificacao()->associate($this->notificacao->getModel()->where('name', $request->notificacao['name'])->first());
 
             $this->model->save();
 
-            $userIidiomaRepository->getModel()->user()->associate($this->model);
-            $userIidiomaRepository->getModel()->idioma()->associate($this->idioma->getModel()->where('name', $request->idioma['name'])->first());
-            $userIidiomaRepository->getModel()->nivel()->associate($this->nivel->getModel()->where('name', $request->nivel['name'])->first());
-            $userIidiomaRepository->getModel()->save();
+//            $userIidiomaRepository->getModel()->user()->associate($this->model);
+//            $userIidiomaRepository->getModel()->idioma()->associate($this->idioma->getModel()->where('name', $request->idioma['name'])->first());
+//            $userIidiomaRepository->getModel()->nivel()->associate($this->nivel->getModel()->where('name', $request->nivel['name'])->first());
+//            $userIidiomaRepository->getModel()->save();
 
             $response = [
                 'message' => 'Usuário criado com sucesso.',
@@ -117,7 +116,6 @@ class UsersController extends Controller
         $data = [
             "idiomas" => $this->idioma->all(),
             "niveis" => $this->nivel->all(),
-            "notificacoes" => $this->notificacao->all(),
             "professores" => $this->repository->getAllProfessores(),
         ];
 

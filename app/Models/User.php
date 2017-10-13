@@ -122,8 +122,8 @@ class User extends Authenticatable implements Transformable
 					->withTimestamps();
 	}
 
-	public function enderecos()
-	{
-		return $this->hasMany(\App\Models\Endereco::class, 'user_id');
-	}
+    public function endereco()
+    {
+        return $this->belongsTo(\App\Models\Endereco::class, 'endereco_id');
+    }
 }

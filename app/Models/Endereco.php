@@ -31,20 +31,13 @@ class Endereco extends Model implements Transformable
 	use \Illuminate\Database\Eloquent\SoftDeletes;
 
 	protected $casts = [
-		'user_id' => 'int'
+		'cidade_id' => 'int'
 	];
 
 	protected $fillable = [
-		'cep',
-		'rua',
-		'bairro',
-		'user_id',
+        'latitude',
+        'longitude',
 	];
-
-	public function user()
-	{
-		return $this->belongsTo(\App\Models\User::class, 'user_id');
-	}
 
 	public function cidade()
     {

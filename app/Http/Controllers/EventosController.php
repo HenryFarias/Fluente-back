@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Interfaces\CidadeRepository;
+use App\Interfaces\IdiomaRepository;
+use App\Interfaces\NivelRepository;
+use App\Repositories\EnderecoRepository;
+use App\Repositories\UserEventoRepository;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -26,10 +31,15 @@ class EventosController extends Controller
      */
     protected $model;
 
-    public function __construct(EventoRepository $repository)
+    private $nivel;
+    private $idioma;
+
+    public function __construct(EventoRepository $repository, NivelRepository $nivel, IdiomaRepository $idioma)
     {
         $this->repository = $repository;
         $this->model = $repository->getModel();
+        $this->nivel = $nivel;
+        $this->idioma = $idioma;
     }
 
 
@@ -55,10 +65,26 @@ class EventosController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function store(EventoCreateRequest $request)
+    public function store(EventoCreateRequest $request, CidadeRepository $cidadeRepository, EnderecoRepository $enderecoRepository, UserEventoRepository $userEvento)
     {
         try {
-            $evento = $this->repository->create($request->all());
+            $cidade = $cidadeRepository->getModel()->where('name', $request->endereco['cidade']['name'])->first();
+            $enderecoRepository->getModel()->fill($request->endereco);
+            $enderecoRepository->getModel()->cidade()->associate($cidade);
+            $enderecoRepository->getModel()->save();
+
+            $this->model->fill($request->all());
+
+            $this->model->endereco()->associate($enderecoRepository->getModel());
+            $this->model->nivel()->associate($this->nivel->getModel()->where('name', $request->nivel['name'])->first());
+            $this->model->idioma()->associate($this->idioma->getModel()->where('name', $request->idioma['name'])->first());
+
+            $this->model->save();
+
+            $userEvento->getModel()->user()->associate($this->model);
+            $userEvento->getModel()->idioma()->associate($this->idioma->getModel()->where('name', $request->idioma['name'])->first());
+            $userEvento->getModel()->nivel()->associate($this->nivel->getModel()->where('name', $request->nivel['name'])->first());
+            $userEvento->getModel()->save();
 
             $response = [
                 'message' => 'Evento criado com sucsso.',

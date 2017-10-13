@@ -33,13 +33,15 @@ class UserEvento extends Model implements Transformable
 	protected $table = 'user_evento';
 
 	protected $casts = [
-		'aceite_professor' => 'bool',
+		'professor' => 'bool',
+		'dono' => 'bool',
 		'evento_id' => 'int',
 		'user_id' => 'int'
 	];
 
 	protected $fillable = [
-		'aceite_professor',
+		'professor',
+		'dono',
 		'evento_id',
 		'user_id'
 	];
