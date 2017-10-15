@@ -2,20 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Interfaces\CidadeRepository;
-use App\Interfaces\IdiomaRepository;
-use App\Interfaces\NivelRepository;
+use App\Repositories\CidadeRepository;
+use App\Repositories\IdiomaRepository;
+use App\Repositories\NivelRepository;
 use App\Repositories\EnderecoRepository;
 use App\Repositories\UserEventoRepository;
-use Illuminate\Http\Request;
-
-use App\Http\Requests;
-use Prettus\Validator\Contracts\ValidatorInterface;
+use App\Repositories\UserEventoRepositoryEloquent;
+use App\Repositories\UserRepository;
+use Carbon\Carbon;
 use Prettus\Validator\Exceptions\ValidatorException;
 use App\Http\Requests\EventoCreateRequest;
 use App\Http\Requests\EventoUpdateRequest;
 use App\Repositories\EventoRepository;
-use App\Validators\EventoValidator;
 
 
 class EventosController extends Controller
@@ -65,13 +63,15 @@ class EventosController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function store(EventoCreateRequest $request, CidadeRepository $cidadeRepository, EnderecoRepository $enderecoRepository, UserEventoRepository $userEvento)
+    public function store(EventoCreateRequest $request, CidadeRepository $cidadeRepository, EnderecoRepository $enderecoRepository, UserEventoRepository $userEventoDono, UserRepository $user)
     {
         try {
             $cidade = $cidadeRepository->getModel()->where('name', $request->endereco['cidade']['name'])->first();
             $enderecoRepository->getModel()->fill($request->endereco);
             $enderecoRepository->getModel()->cidade()->associate($cidade);
             $enderecoRepository->getModel()->save();
+
+            dd($request->all());
 
             $this->model->fill($request->all());
 
@@ -81,14 +81,22 @@ class EventosController extends Controller
 
             $this->model->save();
 
-            $userEvento->getModel()->user()->associate($this->model);
-            $userEvento->getModel()->idioma()->associate($this->idioma->getModel()->where('name', $request->idioma['name'])->first());
-            $userEvento->getModel()->nivel()->associate($this->nivel->getModel()->where('name', $request->nivel['name'])->first());
-            $userEvento->getModel()->save();
+            $userEventoDono->dono = true;
+            $userEventoDono->getModel()->evento()->associate($this->model);
+            $userEventoDono->getModel()->user()->associate($user->find($request->dono->id));
+            $userEventoDono->getModel()->save();
+
+            if (!empty($request->professor)) {
+                $userEventoProfessor = new UserEventoRepositoryEloquent();
+                $userEventoProfessor->professor = true;
+                $userEventoProfessor->getModel()->evento()->associate($this->model);
+                $userEventoProfessor->getModel()->user()->associate($user->getModel()->where('name', $request->professor->name)->first());
+                $userEventoProfessor->getModel()->save();
+            }
 
             $response = [
-                'message' => 'Evento criado com sucsso.',
-                'data'    => $evento->toArray(),
+                'message' => 'Evento criado com sucesso.',
+                'data'    => $this->model,
             ];
 
             return response()->json($response);
