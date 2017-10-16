@@ -14,7 +14,6 @@ use Prettus\Repository\Traits\TransformableTrait;
  * Class UserEvento
  * 
  * @property int $id
- * @property bool $aceite_professor
  * @property int $evento_id
  * @property int $user_id
  * @property \Carbon\Carbon $created_at

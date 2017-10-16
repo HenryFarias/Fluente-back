@@ -2,11 +2,11 @@
 
 namespace App\Repositories;
 
+use Illuminate\Support\Facades\App;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
 use App\Repositories\EventoRepository;
 use App\Models\Evento;
-use App\Validators\EventoValidator;
 
 /**
  * Class EventoRepositoryEloquent
@@ -24,13 +24,21 @@ class EventoRepositoryEloquent extends BaseRepository implements EventoRepositor
         return Evento::class;
     }
 
-    
-
     /**
      * Boot up the repository, pushing criteria
      */
     public function boot()
     {
         $this->pushCriteria(app(RequestCriteria::class));
+    }
+
+    public function getAllForMaps($idUser)
+    {
+        $user = App::make('App\\Repositories\\UserRepository')->find($idUser);
+        $eventosPrivados = $user->eventos()->with('endereco')->where('publico_ou_privado','privado')->get();
+        $eventosPublicos = App::make('App\\Repositories\\EventoRepository')->with(['endereco'])->findByField('publico_ou_privado','publico');
+
+
+        return array_merge($eventosPrivados->toArray(), $eventosPublicos->toArray());
     }
 }

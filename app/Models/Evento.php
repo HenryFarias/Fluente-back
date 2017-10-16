@@ -6,6 +6,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
@@ -62,6 +63,13 @@ class Evento extends Model implements Transformable
 		'assunto_id'
 	];
 
+    // <MUTATORS>
+    public function setDataAttribute($data)
+    {
+        $this->attributes['data'] = Carbon::parse($data);
+    }
+    // </MUTATORS>
+
 	public function assunto()
 	{
 		return $this->belongsTo(\App\Models\Assunto::class);
@@ -82,11 +90,6 @@ class Evento extends Model implements Transformable
         return $this->belongsTo(\App\Models\Idioma::class);
     }
 
-	public function user()
-	{
-		return $this->belongsTo(\App\Models\User::class);
-	}
-
 	public function comentarios()
 	{
 		return $this->hasMany(\App\Models\Comentario::class);
@@ -99,8 +102,6 @@ class Evento extends Model implements Transformable
 
 	public function users()
 	{
-		return $this->belongsToMany(\App\Models\User::class, 'user_evento')
-					->withPivot('id', 'aceite_professor', 'deleted_at')
-					->withTimestamps();
+		return $this->belongsToMany(\App\Models\User::class, 'user_evento', 'evento_id', 'user_id');
 	}
 }

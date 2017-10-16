@@ -105,9 +105,7 @@ class User extends Authenticatable implements Transformable
 
 	public function eventos()
 	{
-		return $this->belongsToMany(\App\Models\Evento::class, 'user_evento')
-					->withPivot('id', 'aceite_professor', 'deleted_at')
-					->withTimestamps();
+		return $this->belongsToMany(\App\Models\Evento::class, 'user_evento', 'user_id', 'evento_id');
 	}
 
 	public function seguidores()

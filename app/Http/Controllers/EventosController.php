@@ -10,6 +10,7 @@ use App\Repositories\UserEventoRepository;
 use App\Repositories\UserEventoRepositoryEloquent;
 use App\Repositories\UserRepository;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\App;
 use Prettus\Validator\Exceptions\ValidatorException;
 use App\Http\Requests\EventoCreateRequest;
 use App\Http\Requests\EventoUpdateRequest;
@@ -40,6 +41,12 @@ class EventosController extends Controller
         $this->idioma = $idioma;
     }
 
+    public function getAll($idUser)
+    {
+        return response()->json([
+            'data' => $this->repository->getAllForMaps($idUser),
+        ]);
+    }
 
     /**
      * Display a listing of the resource.
@@ -48,8 +55,7 @@ class EventosController extends Controller
      */
     public function index()
     {
-        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-        $eventos = $this->repository->all();
+        $eventos = $this->repository->with(['endereco'])->findByField('publico_ou_privado','publico');
 
         return response()->json([
             'data' => $eventos,
@@ -71,8 +77,6 @@ class EventosController extends Controller
             $enderecoRepository->getModel()->cidade()->associate($cidade);
             $enderecoRepository->getModel()->save();
 
-            dd($request->all());
-
             $this->model->fill($request->all());
 
             $this->model->endereco()->associate($enderecoRepository->getModel());
@@ -81,16 +85,16 @@ class EventosController extends Controller
 
             $this->model->save();
 
-            $userEventoDono->dono = true;
+            $userEventoDono->dono = 1;
             $userEventoDono->getModel()->evento()->associate($this->model);
-            $userEventoDono->getModel()->user()->associate($user->find($request->dono->id));
+            $userEventoDono->getModel()->user()->associate($user->find($request->dono['id']));
             $userEventoDono->getModel()->save();
 
-            if (!empty($request->professor)) {
-                $userEventoProfessor = new UserEventoRepositoryEloquent();
+            if (!empty($request->professor['name'])) {
+                $userEventoProfessor = App::make('App\\Repositories\\UserEventoRepository');
                 $userEventoProfessor->professor = true;
                 $userEventoProfessor->getModel()->evento()->associate($this->model);
-                $userEventoProfessor->getModel()->user()->associate($user->getModel()->where('name', $request->professor->name)->first());
+                $userEventoProfessor->getModel()->user()->associate($user->getModel()->where('name', $request->professor['name'])->first());
                 $userEventoProfessor->getModel()->save();
             }
 
