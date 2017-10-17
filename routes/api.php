@@ -19,4 +19,5 @@ Route::resource('evento', 'EventosController');
 Route::resource('seguidores', 'SeguidoresController');
 Route::post('login', 'AuthController@login');
 Route::get('seguidores/{id}', 'UsersController@getSeguidores');
+Route::get('evento/allMaps/{id}', 'EventosController@getAllForMaps');
 Route::get('evento/all/{id}', 'EventosController@getAll');

@@ -41,10 +41,17 @@ class EventosController extends Controller
         $this->idioma = $idioma;
     }
 
-    public function getAll($idUser)
+    public function getAllForMaps($idUser)
     {
         return response()->json([
             'data' => $this->repository->getAllForMaps($idUser),
+        ]);
+    }
+
+    public function getAll($idUser)
+    {
+        return response()->json([
+            'data' => $this->repository->getAll($idUser),
         ]);
     }
 
@@ -85,7 +92,7 @@ class EventosController extends Controller
 
             $this->model->save();
 
-            $userEventoDono->dono = 1;
+            $userEventoDono->dono = true;
             $userEventoDono->getModel()->evento()->associate($this->model);
             $userEventoDono->getModel()->user()->associate($user->find($request->dono['id']));
             $userEventoDono->getModel()->save();

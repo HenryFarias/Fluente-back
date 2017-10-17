@@ -38,7 +38,14 @@ class EventoRepositoryEloquent extends BaseRepository implements EventoRepositor
         $eventosPrivados = $user->eventos()->with('endereco')->where('publico_ou_privado','privado')->get();
         $eventosPublicos = App::make('App\\Repositories\\EventoRepository')->with(['endereco'])->findByField('publico_ou_privado','publico');
 
-
         return array_merge($eventosPrivados->toArray(), $eventosPublicos->toArray());
+    }
+
+    public function getAll($idUser)
+    {
+        $user = App::make('App\\Repositories\\UserRepository')->find($idUser);
+        $eventos = $user->eventos()->get();
+
+        return $eventos->toArray();
     }
 }
