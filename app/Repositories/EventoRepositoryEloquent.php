@@ -45,7 +45,12 @@ class EventoRepositoryEloquent extends BaseRepository implements EventoRepositor
     {
         $user = App::make('App\\Repositories\\UserRepository')->find($idUser);
         $eventos = $user->eventos()->get();
+        $eventosDono = $user->eventosDono()->get()->toArray();
 
-        return $eventos->toArray();
+        foreach ($eventosDono as $index => $evento) {
+            $eventosDono[$index]['dono'] = $user->toArray();
+        }
+
+        return array_merge($eventos->toArray(), $eventosDono);
     }
 }

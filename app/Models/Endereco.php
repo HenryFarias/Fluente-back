@@ -37,6 +37,7 @@ class Endereco extends Model implements Transformable
 	protected $fillable = [
         'latitude',
         'longitude',
+        'name',
 	];
 
 	public function cidade()

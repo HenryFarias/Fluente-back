@@ -89,17 +89,12 @@ class EventosController extends Controller
             $this->model->endereco()->associate($enderecoRepository->getModel());
             $this->model->nivel()->associate($this->nivel->getModel()->where('name', $request->nivel['name'])->first());
             $this->model->idioma()->associate($this->idioma->getModel()->where('name', $request->idioma['name'])->first());
+            $this->model->dono()->associate($user->find($request->dono['id']));
 
             $this->model->save();
 
-            $userEventoDono->dono = true;
-            $userEventoDono->getModel()->evento()->associate($this->model);
-            $userEventoDono->getModel()->user()->associate($user->find($request->dono['id']));
-            $userEventoDono->getModel()->save();
-
             if (!empty($request->professor['name'])) {
                 $userEventoProfessor = App::make('App\\Repositories\\UserEventoRepository');
-                $userEventoProfessor->professor = true;
                 $userEventoProfessor->getModel()->evento()->associate($this->model);
                 $userEventoProfessor->getModel()->user()->associate($user->getModel()->where('name', $request->professor['name'])->first());
                 $userEventoProfessor->getModel()->save();
@@ -129,26 +124,18 @@ class EventosController extends Controller
      */
     public function show($id)
     {
-        $evento = $this->repository->find($id);
+        $evento = $this->repository->with(['dono', 'nivel', 'endereco', 'idioma'])->find($id)->toArray();
+
+        foreach ($evento->users()->get()->toArray() as $user) {
+            if (!empty($user->formacao)) {
+                $evento['professor'] = $user;
+                break;
+            }
+        }
 
         return response()->json([
             'data' => $evento,
         ]);
-    }
-
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int $id
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        $evento = $this->repository->find($id);
-
-        return view('eventos.edit', compact('evento'));
     }
 
 
@@ -160,14 +147,30 @@ class EventosController extends Controller
      *
      * @return Response
      */
-    public function update(EventoUpdateRequest $request, $id)
+    public function update(EventoUpdateRequest $request, $id, EnderecoRepository $enderecoRepository,  CidadeRepository $cidadeRepository)
     {
         try {
             $evento = $this->repository->update($request->all(), $id);
 
+            $cidade = $cidadeRepository->getModel()->where('name', $request->endereco['cidade']['name'])->first();
+            $enderecoRepository->getModel()->fill($request->endereco);
+            $enderecoRepository->getModel()->cidade()->associate($cidade);
+            $enderecoRepository->getModel()->save();
+
+            $evento->nivel()->associate($this->nivel->getModel()->where('name', $request->nivel['name'])->first());
+            $evento->idioma()->associate($this->idioma->getModel()->where('name', $request->idioma['name'])->first());
+            $evento->idioma()->associate($enderecoRepository->getModel());
+            $evento->save();
+
+            if (!empty($request->professor['name'])) {
+                $userEventoProfessor = App::make('App\\Repositories\\UserEventoRepository');
+                $userEventoProfessor->getModel()->evento()->associate($this->model);
+                $userEventoProfessor->getModel()->user()->associate($user->getModel()->where('name', $request->professor['name'])->first());
+                $userEventoProfessor->getModel()->save();
+            }
+
             $response = [
                 'message' => 'Evento alterado com sucesso.',
-                'data'    => $evento->toArray(),
             ];
 
             return response()->json($response);
@@ -189,11 +192,13 @@ class EventosController extends Controller
      */
     public function destroy($id)
     {
-        $deleted = $this->repository->delete($id);
+        $evento = $this->repository->find($id);
+        $idUser = $evento->dono->id;
+        $this->repository->delete($id);
 
         return response()->json([
             'message' => 'Evento excluído com sucesso.',
-            'deleted' => $deleted,
+            'data' => $this->repository->getAll($idUser),
         ]);
     }
 }

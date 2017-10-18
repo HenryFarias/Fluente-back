@@ -60,7 +60,8 @@ class Evento extends Model implements Transformable
 		'descricao',
 		'endereco_id',
 		'user_id',
-		'assunto_id'
+		'assunto_id',
+		'dono_id',
 	];
 
     // <MUTATORS>
@@ -94,6 +95,11 @@ class Evento extends Model implements Transformable
 	{
 		return $this->hasMany(\App\Models\Comentario::class);
 	}
+
+    public function dono()
+    {
+        return $this->belongsTo(\App\Models\User::class);
+    }
 
 //	public function nivel_eventos()
 //	{
