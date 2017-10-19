@@ -47,6 +47,12 @@ class UsersController extends Controller
         $this->notificacao = $notificacao;
     }
 
+    public function getAllForEventos($id)
+    {
+        return response()->json([
+            'data' => $this->repository->getAllForEventos($id),
+        ]);
+    }
 
     /**
      * Display a listing of the resource.

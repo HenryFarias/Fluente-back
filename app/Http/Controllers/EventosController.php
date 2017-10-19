@@ -76,9 +76,10 @@ class EventosController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function store(EventoCreateRequest $request, CidadeRepository $cidadeRepository, EnderecoRepository $enderecoRepository, UserEventoRepository $userEventoDono, UserRepository $user)
+    public function store(EventoCreateRequest $request, CidadeRepository $cidadeRepository, EnderecoRepository $enderecoRepository, UserEventoRepository $userEvento, UserRepository $userRespository)
     {
         try {
+//            dd($request->all());
             $cidade = $cidadeRepository->getModel()->where('name', $request->endereco['cidade']['name'])->first();
             $enderecoRepository->getModel()->fill($request->endereco);
             $enderecoRepository->getModel()->cidade()->associate($cidade);
@@ -89,14 +90,20 @@ class EventosController extends Controller
             $this->model->endereco()->associate($enderecoRepository->getModel());
             $this->model->nivel()->associate($this->nivel->getModel()->where('name', $request->nivel['name'])->first());
             $this->model->idioma()->associate($this->idioma->getModel()->where('name', $request->idioma['name'])->first());
-            $this->model->dono()->associate($user->find($request->dono['id']));
+            $this->model->dono()->associate($userRespository->find($request->dono['id']));
 
             $this->model->save();
+
+            foreach ($request->users as $user) {
+                $userEvento->getModel()->evento()->associate($this->model);
+                $userEvento->getModel()->user()->associate($userRespository->getModel()->find($user['id']));
+                $userEvento->getModel()->save();
+            }
 
             if (!empty($request->professor['name'])) {
                 $userEventoProfessor = App::make('App\\Repositories\\UserEventoRepository');
                 $userEventoProfessor->getModel()->evento()->associate($this->model);
-                $userEventoProfessor->getModel()->user()->associate($user->getModel()->where('name', $request->professor['name'])->first());
+                $userEventoProfessor->getModel()->user()->associate($userRespository->getModel()->where('name', $request->professor['name'])->first());
                 $userEventoProfessor->getModel()->save();
             }
 
@@ -124,17 +131,18 @@ class EventosController extends Controller
      */
     public function show($id)
     {
-        $evento = $this->repository->with(['dono', 'nivel', 'endereco', 'idioma'])->find($id)->toArray();
+        $evento = $this->repository->with(['dono', 'nivel', 'endereco', 'idioma', 'users'])->find($id);
+        $eventoArray = $evento->toArray();
 
         foreach ($evento->users()->get()->toArray() as $user) {
-            if (!empty($user->formacao)) {
-                $evento['professor'] = $user;
+            if (!empty($user['formacao'])) {
+                $eventoArray['professor'] = $user;
                 break;
             }
         }
 
         return response()->json([
-            'data' => $evento,
+            'data' => $eventoArray,
         ]);
     }
 

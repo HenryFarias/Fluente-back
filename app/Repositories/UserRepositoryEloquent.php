@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use Illuminate\Support\Facades\App;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
 use App\Models\User;
@@ -28,6 +29,11 @@ class UserRepositoryEloquent extends BaseRepository implements UserRepository
     public function boot()
     {
         $this->pushCriteria(app(RequestCriteria::class));
+    }
+
+    public function getAllForEventos($id)
+    {
+        return App::make('App\\Repositories\\UserRepository')->findWhereNotIn('id', [$id]);
     }
 
     public function getAllProfessores()
