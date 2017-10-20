@@ -113,6 +113,11 @@ class User extends Authenticatable implements Transformable
         return $this->hasMany(\App\Models\Evento::class, 'dono_id');
     }
 
+    public function eventosProfessor()
+    {
+        return $this->hasMany(\App\Models\Evento::class, 'professor_id');
+    }
+
 	public function seguidores()
 	{
 		return $this->hasMany(\App\Models\Seguidores::class, 'userSeguido_id');

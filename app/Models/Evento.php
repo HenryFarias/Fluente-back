@@ -48,10 +48,6 @@ class Evento extends Model implements Transformable
 		'assunto_id' => 'int'
 	];
 
-	protected $dates = [
-		'data'
-	];
-
 	protected $fillable = [
 		'name',
 		'publico_ou_privado',
@@ -62,12 +58,15 @@ class Evento extends Model implements Transformable
 		'user_id',
 		'assunto_id',
 		'dono_id',
+		'professor_id',
 	];
 
     // <MUTATORS>
     public function setDataAttribute($data)
     {
-        $this->attributes['data'] = Carbon::parse($data);
+        if (is_string($data)) {
+            $this->attributes['data'] = Carbon::parse($data);
+        }
     }
     // </MUTATORS>
 
@@ -98,7 +97,12 @@ class Evento extends Model implements Transformable
 
     public function dono()
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(\App\Models\User::class, 'dono_id');
+    }
+
+    public function professor()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'professor_id');
     }
 
 //	public function nivel_eventos()

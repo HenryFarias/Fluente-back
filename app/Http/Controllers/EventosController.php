@@ -76,16 +76,21 @@ class EventosController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function store(EventoCreateRequest $request, CidadeRepository $cidadeRepository, EnderecoRepository $enderecoRepository, UserEventoRepository $userEvento, UserRepository $userRespository)
+    public function store(EventoCreateRequest $request, CidadeRepository $cidadeRepository, EnderecoRepository $enderecoRepository, UserRepository $userRespository)
     {
         try {
-//            dd($request->all());
+            $arrayIds = [];
+
             $cidade = $cidadeRepository->getModel()->where('name', $request->endereco['cidade']['name'])->first();
             $enderecoRepository->getModel()->fill($request->endereco);
             $enderecoRepository->getModel()->cidade()->associate($cidade);
             $enderecoRepository->getModel()->save();
 
             $this->model->fill($request->all());
+
+            if (!empty($request->professor['name'])) {
+                $this->model->professor()->associate($userRespository->getModel()->where('name', $request->professor['name'])->first());
+            }
 
             $this->model->endereco()->associate($enderecoRepository->getModel());
             $this->model->nivel()->associate($this->nivel->getModel()->where('name', $request->nivel['name'])->first());
@@ -95,17 +100,10 @@ class EventosController extends Controller
             $this->model->save();
 
             foreach ($request->users as $user) {
-                $userEvento->getModel()->evento()->associate($this->model);
-                $userEvento->getModel()->user()->associate($userRespository->getModel()->find($user['id']));
-                $userEvento->getModel()->save();
+                $arrayIds[] = $user['id'];
             }
 
-            if (!empty($request->professor['name'])) {
-                $userEventoProfessor = App::make('App\\Repositories\\UserEventoRepository');
-                $userEventoProfessor->getModel()->evento()->associate($this->model);
-                $userEventoProfessor->getModel()->user()->associate($userRespository->getModel()->where('name', $request->professor['name'])->first());
-                $userEventoProfessor->getModel()->save();
-            }
+            $this->model->users()->attach($arrayIds);
 
             $response = [
                 'message' => 'Evento criado com sucesso.',
@@ -131,18 +129,10 @@ class EventosController extends Controller
      */
     public function show($id)
     {
-        $evento = $this->repository->with(['dono', 'nivel', 'endereco', 'idioma', 'users'])->find($id);
-        $eventoArray = $evento->toArray();
-
-        foreach ($evento->users()->get()->toArray() as $user) {
-            if (!empty($user['formacao'])) {
-                $eventoArray['professor'] = $user;
-                break;
-            }
-        }
+        $evento = $this->repository->with(['dono', 'nivel', 'endereco', 'idioma', 'users', 'professor'])->find($id);
 
         return response()->json([
-            'data' => $eventoArray,
+            'data' => $evento,
         ]);
     }
 
@@ -155,27 +145,38 @@ class EventosController extends Controller
      *
      * @return Response
      */
-    public function update(EventoUpdateRequest $request, $id, EnderecoRepository $enderecoRepository,  CidadeRepository $cidadeRepository)
+    public function update(EventoUpdateRequest $request, $id, EnderecoRepository $enderecoRepository,  CidadeRepository $cidadeRepository, UserRepository $user)
     {
         try {
+            $arrayIds = [];
+
             $evento = $this->repository->update($request->all(), $id);
 
-            $cidade = $cidadeRepository->getModel()->where('name', $request->endereco['cidade']['name'])->first();
-            $enderecoRepository->getModel()->fill($request->endereco);
-            $enderecoRepository->getModel()->cidade()->associate($cidade);
-            $enderecoRepository->getModel()->save();
+            if ($evento->endereco->id != $request->endereco_id) {
+                $cidade = $cidadeRepository->getModel()->where('name', $request->endereco['cidade']['name'])->first();
+                $enderecoRepository->getModel()->fill($request->endereco);
+                $enderecoRepository->getModel()->cidade()->associate($cidade);
+                $enderecoRepository->getModel()->save();
+                $evento->endereco()->associate($enderecoRepository->getModel());
+            }
+
+            $professor = $user->getModel()->where('name', $request->professor['name'])->first();
+
+            if (!empty($request->professor['name']) && $evento->professor_id != $professor->id) {
+                $evento->professor()->associate($user->getModel()->where('name', $request->professor['name'])->first());
+            } else {
+                $evento->professor()->associate(null);
+            }
 
             $evento->nivel()->associate($this->nivel->getModel()->where('name', $request->nivel['name'])->first());
             $evento->idioma()->associate($this->idioma->getModel()->where('name', $request->idioma['name'])->first());
-            $evento->idioma()->associate($enderecoRepository->getModel());
             $evento->save();
 
-            if (!empty($request->professor['name'])) {
-                $userEventoProfessor = App::make('App\\Repositories\\UserEventoRepository');
-                $userEventoProfessor->getModel()->evento()->associate($this->model);
-                $userEventoProfessor->getModel()->user()->associate($user->getModel()->where('name', $request->professor['name'])->first());
-                $userEventoProfessor->getModel()->save();
+            foreach ($request->users as $user) {
+                $arrayIds[] = $user['id'];
             }
+
+            $evento->users()->sync($arrayIds);
 
             $response = [
                 'message' => 'Evento alterado com sucesso.',
