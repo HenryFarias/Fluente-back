@@ -24,7 +24,10 @@ class NivelEventoRepositoryEloquent extends BaseRepository implements NivelEvent
         return NivelEvento::class;
     }
 
-    
+    public function getModel()
+    {
+        return new $this->model;
+    }
 
     /**
      * Boot up the repository, pushing criteria

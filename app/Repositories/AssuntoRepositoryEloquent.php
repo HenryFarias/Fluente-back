@@ -24,7 +24,10 @@ class AssuntoRepositoryEloquent extends BaseRepository implements AssuntoReposit
         return Assunto::class;
     }
 
-    
+    public function getModel()
+    {
+        return new $this->model;
+    }
 
     /**
      * Boot up the repository, pushing criteria

@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cidade;
+use App\Models\Endereco;
+use App\Models\User;
 use App\Repositories\CidadeRepository;
 use App\Repositories\IdiomaRepository;
 use App\Repositories\NivelRepository;
@@ -76,26 +79,26 @@ class EventosController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function store(EventoCreateRequest $request, CidadeRepository $cidadeRepository, EnderecoRepository $enderecoRepository, UserRepository $userRespository)
+    public function store(EventoCreateRequest $request, Cidade $cidade, Endereco $endereco, User $user)
     {
         try {
             $arrayIds = [];
 
-            $cidade = $cidadeRepository->getModel()->where('name', $request->endereco['cidade']['name'])->first();
-            $enderecoRepository->getModel()->fill($request->endereco);
-            $enderecoRepository->getModel()->cidade()->associate($cidade);
-            $enderecoRepository->getModel()->save();
+            $cidade = $cidade->where('name', $request->endereco['cidade']['name'])->first();
+            $endereco->fill($request->endereco);
+            $endereco->cidade()->associate($cidade);
+            $endereco->save();
 
             $this->model->fill($request->all());
 
             if (!empty($request->professor['name'])) {
-                $this->model->professor()->associate($userRespository->getModel()->where('name', $request->professor['name'])->first());
+                $this->model->professor()->associate($user->where('id', $request->professor['id'])->first());
             }
 
-            $this->model->endereco()->associate($enderecoRepository->getModel());
-            $this->model->nivel()->associate($this->nivel->getModel()->where('name', $request->nivel['name'])->first());
-            $this->model->idioma()->associate($this->idioma->getModel()->where('name', $request->idioma['name'])->first());
-            $this->model->dono()->associate($userRespository->find($request->dono['id']));
+            $this->model->endereco()->associate($endereco);
+            $this->model->nivel()->associate($this->nivel->getModel()->where('id', $request->nivel['id'])->first());
+            $this->model->idioma()->associate($this->idioma->getModel()->where('id', $request->idioma['id'])->first());
+            $this->model->dono()->associate($user->find($request->dono['id']));
 
             $this->model->save();
 
@@ -145,7 +148,7 @@ class EventosController extends Controller
      *
      * @return Response
      */
-    public function update(EventoUpdateRequest $request, $id, EnderecoRepository $enderecoRepository,  CidadeRepository $cidadeRepository, UserRepository $user)
+    public function update(EventoUpdateRequest $request, $id, Endereco $endereco,  Cidade $cidade, User $user)
     {
         try {
             $arrayIds = [];
@@ -153,23 +156,23 @@ class EventosController extends Controller
             $evento = $this->repository->update($request->all(), $id);
 
             if ($evento->endereco->id != $request->endereco_id) {
-                $cidade = $cidadeRepository->getModel()->where('name', $request->endereco['cidade']['name'])->first();
-                $enderecoRepository->getModel()->fill($request->endereco);
-                $enderecoRepository->getModel()->cidade()->associate($cidade);
-                $enderecoRepository->getModel()->save();
-                $evento->endereco()->associate($enderecoRepository->getModel());
+                $cidade = $cidade->where('name', $request->endereco['cidade']['name'])->first();
+                $endereco->fill($request->endereco);
+                $endereco->cidade()->associate($cidade);
+                $endereco->save();
+                $evento->endereco()->associate($endereco);
             }
 
-            $professor = $user->getModel()->where('name', $request->professor['name'])->first();
+            $professor = $user->where('id', $request->professor['id'])->first();
 
-            if (!empty($request->professor['name']) && $evento->professor_id != $professor->id) {
-                $evento->professor()->associate($user->getModel()->where('name', $request->professor['name'])->first());
+            if (!empty($request->professor['id']) && $evento->professor_id != $professor->id) {
+                $evento->professor()->associate($user->where('id', $request->professor['id'])->first());
             } else {
-                $evento->professor()->associate(null);
+                $evento->professor()->dissociate($user->where('id', $request->professor['id'])->first());
             }
 
-            $evento->nivel()->associate($this->nivel->getModel()->where('name', $request->nivel['name'])->first());
-            $evento->idioma()->associate($this->idioma->getModel()->where('name', $request->idioma['name'])->first());
+            $evento->nivel()->associate($this->nivel->getModel()->where('id', $request->nivel['id'])->first());
+            $evento->idioma()->associate($this->idioma->getModel()->where('id', $request->idioma['id'])->first());
             $evento->save();
 
             foreach ($request->users as $user) {

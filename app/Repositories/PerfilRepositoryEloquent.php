@@ -23,7 +23,10 @@ class PerfilRepositoryEloquent extends BaseRepository implements PerfilRepositor
         return Perfil::class;
     }
 
-    
+    public function getModel()
+    {
+        return new $this->model;
+    }
 
     /**
      * Boot up the repository, pushing criteria

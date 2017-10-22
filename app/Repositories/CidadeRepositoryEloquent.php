@@ -24,7 +24,10 @@ class CidadeRepositoryEloquent extends BaseRepository implements CidadeRepositor
         return Cidade::class;
     }
 
-    
+    public function getModel()
+    {
+        return new $this->model;
+    }
 
     /**
      * Boot up the repository, pushing criteria

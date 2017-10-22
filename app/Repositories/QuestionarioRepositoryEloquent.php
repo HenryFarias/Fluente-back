@@ -24,7 +24,10 @@ class QuestionarioRepositoryEloquent extends BaseRepository implements Questiona
         return Questionario::class;
     }
 
-    
+    public function getModel()
+    {
+        return new $this->model;
+    }
 
     /**
      * Boot up the repository, pushing criteria

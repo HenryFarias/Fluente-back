@@ -24,7 +24,10 @@ class ComentarioRepositoryEloquent extends BaseRepository implements ComentarioR
         return Comentario::class;
     }
 
-    
+    public function getModel()
+    {
+        return new $this->model;
+    }
 
     /**
      * Boot up the repository, pushing criteria

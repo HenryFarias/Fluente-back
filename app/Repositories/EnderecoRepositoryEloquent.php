@@ -23,7 +23,10 @@ class EnderecoRepositoryEloquent extends BaseRepository implements EnderecoRepos
         return Endereco::class;
     }
 
-    
+    public function getModel()
+    {
+        return new $this->model;
+    }
 
     /**
      * Boot up the repository, pushing criteria

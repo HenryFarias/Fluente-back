@@ -23,7 +23,10 @@ class NotificacaoRepositoryEloquent extends BaseRepository implements Notificaca
         return Notificacao::class;
     }
 
-    
+    public function getModel()
+    {
+        return new $this->model;
+    }
 
     /**
      * Boot up the repository, pushing criteria

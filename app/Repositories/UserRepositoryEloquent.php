@@ -23,6 +23,11 @@ class UserRepositoryEloquent extends BaseRepository implements UserRepository
         return User::class;
     }
 
+    public function getModel()
+    {
+        return new $this->model;
+    }
+
     /**
      * Boot up the repository, pushing criteria
      */
@@ -38,6 +43,18 @@ class UserRepositoryEloquent extends BaseRepository implements UserRepository
 
     public function getAllProfessores()
     {
-        return $this->getModel()->where("formacao", "!=", "null")->get();
+        $professores = [];
+
+        $users = $this->model->with(['perfil' => function($q) {
+            $q->where('name', 'Professor');
+        }])->get()->toArray();
+
+        foreach ($users as $user) {
+            if ($user['perfil']['name'] == 'Professor') {
+                $professores[] = $user;
+            }
+        }
+
+        return $professores;
     }
 }

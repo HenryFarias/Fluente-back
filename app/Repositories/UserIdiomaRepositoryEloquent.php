@@ -24,7 +24,10 @@ class UserIdiomaRepositoryEloquent extends BaseRepository implements UserIdiomaR
         return UserIdioma::class;
     }
 
-    
+    public function getModel()
+    {
+        return new $this->model;
+    }
 
     /**
      * Boot up the repository, pushing criteria

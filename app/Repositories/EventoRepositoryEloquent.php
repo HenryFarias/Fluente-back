@@ -24,6 +24,11 @@ class EventoRepositoryEloquent extends BaseRepository implements EventoRepositor
         return Evento::class;
     }
 
+    public function getModel()
+    {
+        return new $this->model;
+    }
+
     /**
      * Boot up the repository, pushing criteria
      */

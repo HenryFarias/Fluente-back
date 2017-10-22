@@ -40,7 +40,7 @@ class UsersController extends Controller
     public function __construct(UserRepository $repository, IdiomaRepository $idioma, NivelRepository $nivel, NotificacaoRepository $notificacao)
     {
         $this->repository = $repository;
-        $this->model = $repository->getModel();
+        $this->model = $repository->model();
 
         $this->idioma = $idioma;
         $this->nivel = $nivel;

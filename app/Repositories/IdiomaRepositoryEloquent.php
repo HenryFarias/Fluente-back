@@ -24,7 +24,10 @@ class IdiomaRepositoryEloquent extends BaseRepository implements IdiomaRepositor
         return Idioma::class;
     }
 
-    
+    public function getModel()
+    {
+        return new $this->model;
+    }
 
     /**
      * Boot up the repository, pushing criteria

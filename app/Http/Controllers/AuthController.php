@@ -14,7 +14,7 @@ class AuthController extends Controller
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             return response()->json([
                 'message' => 'Usuário autenticado com sucesso.',
-                'data' => Auth::user()->load('endereco'),
+                'data' => Auth::user()->load('endereco', 'idiomas'),
             ]);
         } else {
             return response()->json(['error' => 'Falha na autenticação.'], 401);

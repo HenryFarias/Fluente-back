@@ -23,6 +23,11 @@ class SeguidoresRepositoryEloquent extends BaseRepository implements SeguidoresR
         return Seguidores::class;
     }
 
+    public function getModel()
+    {
+        return new $this->model;
+    }
+
     /**
      * Boot up the repository, pushing criteria
      */
